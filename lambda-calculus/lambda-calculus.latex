@@ -1,0 +1,374 @@
+\documentclass[12pt, letterpaper]{extarticle}
+\usepackage{etoolbox}
+\usepackage{textcomp}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{tikz}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{mathtools}
+\usepackage[shortlabels]{enumitem}
+\newenvironment{sqcases}{%
+  \matrix@check\sqcases\env@sqcases
+}{%
+  \endarray\right.%
+}
+\def\env@sqcases{%
+  \let\@ifnextchar\new@ifnextchar
+  \left\lbrack
+  \def\arraystretch{1.2}%
+  \array{@{}l@{\quad}l@{}}%
+}
+\makeatletter
+\newcommand{\N}{\ensuremath{\mathbb N}}
+\newcommand{\R}{\ensuremath{\mathbb R}}
+\newcommand{\Z}{\ensuremath{\mathbb Z}}
+\newcommand{\F}{\ensuremath{\mathbb F}}
+\newcommand{\W}{\ensuremath{\mathbb W}}
+\newcommand{\V}{\ensuremath{\mathbb V}}
+\newcommand{\Q}{\ensuremath{\mathbb Q}}
+\newcommand{\T}{\ensuremath{\mathbb T}}
+\newcommand{\Y}{\ensuremath{\mathbb Y}}
+\newcommand{\ararr}{\xrightarrow[\text{$\alpha$}]{\text{}}}
+\newcommand{\blarr}{\xleftarrow[\text{$\beta$}]{\text{}}}
+\newcommand{\brarr}{\xrightarrow[\text{$\beta$}]{\text{}}}
+\newcommand{\qrarr}{\xrightarrow[\text{?}]{\text{}}}
+\newcommand\aeq{\stackrel{\alpha}{\equiv}}
+\newcommand\beq{\stackrel{\beta}{=}}
+\newcommand*{\da@xarrow}[7]{%
+  % #1: below
+  % #2: above
+  % #3: arrow left
+  % #4: arrow right
+  % #5: space left
+  % #6: space right
+  % #7: math style
+  \sbox0{$\ifx#7\scriptstyle\scriptscriptstyle\else\scriptstyle\fi#5#1#6\m@th$}%
+  \sbox2{$\ifx#7\scriptstyle\scriptscriptstyle\else\scriptstyle\fi#5#2#6\m@th$}%
+  \sbox4{$#7\dabar@\m@th$}%
+  \dimen@=\wd0 %
+  \ifdim\wd2 >\dimen@
+    \dimen@=\wd2
+  \fi
+  \count@=2 %
+  \def\da@bars{\dabar@\dabar@}%
+  \@whiledim\count@\wd4<\dimen@\do{%
+    \advance\count@\@ne
+    \expandafter\def\expandafter\da@bars\expandafter{%
+      \da@bars
+      \dabar@
+    }%
+  }%
+  \mathrel{#3}%
+  \mathrel{%
+    \mathop{\da@bars}\limits
+    \ifx\\#1\\%
+    \else
+      _{\copy0}%
+    \fi
+    \ifx\\#2\\%
+    \else
+      ^{\copy2}%
+    \fi
+  }%
+  \mathrel{#4}%
+}
+\newcommand*{\da@rightarrow}{\mathchar"0\hexnumber@\symAMSa 4B }
+\newcommand*{\xdashrightarrow}[2][]{%
+  \mathrel{%
+    \mathpalette{\da@xarrow{#1}{#2}{}\da@rightarrow{\,}{}}{}%
+  }%
+}
+\newcommand{\lam}[2]{\lambda #1.\; #2}
+\makeatother
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Image}{Im}
+\DeclareMathOperator{\Mat}{Mat}
+\DeclareMathOperator{\rk}{rk}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\id}{id}
+\DeclareMathOperator{\am}{a.m.}
+\DeclareMathOperator{\gm}{g.m.}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\title{$\lambda$-исчисление}
+\author{Лаптов Дмитрий}
+\date{18.03.2021}
+\newtheorem{definition}{Определение}[section]
+\newtheorem{example}{Пример}
+\newtheorem{badexample}{Антипример}
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem{statement}{Утверждение}[section]
+\newtheorem{consequence}{Следствие}[theorem]
+\theoremstyle{remark}
+\newtheorem*{remark}{Примечание}
+\newtheorem*{clue}{Разгадка}
+
+\begin{document}
+\maketitle
+\section{Базовые определения}
+\begin{definition}
+    $\lambda$-термы - это:
+    \begin{enumerate}
+        \item $x_1, x_2, \ldots$ - $\lambda$-термы. (переменные)
+        \item $c_1, c_2, \ldots$ - $\lambda$-термы. (константы)
+        \item если $u, v$ - $\lambda$-термы, то $(u v)$ - $\lambda$-терм.
+        \item если $u - \lambda$-терм, а  $x$ - переменная, то  $(\lambda x.u)$
+            - тоже $\lambda$-терм.
+    \end{enumerate}
+
+\end{definition}
+    Множество $\lambda$-термов - это наименьшее множество, удовлетворяющее данному набору
+    условий.
+\begin{example}
+     $\lambda x.x$ - тождественная функция.
+\end{example}
+\begin{example}
+    $B = \lambda f.\lambda g. \lambda x. f (g x)$ - композиция функций.
+\end{example}
+\begin{remark}
+    $(B f g) x \equiv f (g x)$
+\end{remark}
+\begin{definition}
+    $\alpha$-конверсия:
+    \begin{center}
+        $\lambda x.u \ararr \lambda y. u[x:=y]$
+    \end{center}
+\end{definition}
+\begin{remark}
+    Переименовывать мы имеем право только свободные вхождения переменной.
+\end{remark}
+\begin{example}
+    $\lambda x.(\lambda x.x) \ararr \lambda y.(\lambda x.x)$
+\end{example}
+    $\alpha$-конверсия используется для предотвращения конфликта имен переменны
+    х. $\lambda$-термы мы рассматриваем все с точностью до $\alpha$-конверсии.
+\begin{definition}
+    $\beta$-редукция - это:
+    \begin{center}
+        $(\lambda x.u) v \brarr u[x:=v]$ (если подстановка допустима)
+    \end{center}
+\end{definition}
+    Для того, чтобы подставка была допустимой, должны быть выполнены некоторые
+    условия.
+\begin{badexample}
+    $(\lambda x. \underbrace{\lambda z.(x z)}_\text{u}) \underbrace{z}_\text{v}
+    \qrarr \lambda z.(z z)$
+\end{badexample}
+\begin{clue}
+    В выражении $(\lambda x. u) z$ внешний  $z$ в терме $u$ свободен, и при разных значения
+    х  $v$ получались потенциально разные значения терма u. При этом при подста
+    новке  $z$ стал связанным, поэтому это не является корректной  $\beta$-реду
+    кцией.
+\end{clue}
+\begin{example}
+    $(\lambda x. \lambda z. (x z)) z \ararr (\lambda x. \lambda y. (x y)) z
+    \brarr (\lambda y. z y)$
+\end{example}
+    То есть, переменные, которые были свободны в $v$, не должны оказаться связа
+    нными $\lambda$-операторами, которые были в  $u$. В таком случае подставка
+    называется \emph{свободной} или \emph{допустимой}. Если она недопустима, то
+    это решается применением $\alpha$-конверсии. Таким образом, если в $u$ нет
+    $\lambda$-операторов, или в $v$ нет свободных переменных, подставнока всегд
+    а будет допустимой.
+
+    Другой подход заключается в том, что можно завести 2 алфавита свободных переменных и связанных, и связанные переменные всегда берутся из другого набор
+    а. Проблема заключается в том, что при применении $\lambda$-оператора по переменной $x$, придется переменовывать все её свободные вхождения в данном терме.
+\begin{remark}
+    $\beta$-редукцию можно применять к подтермам бóльшего терма:
+    \begin{center}
+        \uline{$\hspace{0.5cm}\ldots\hspace{0.5cm}(\lambda x.u)
+        v\hspace{0.5cm}\ldots\hspace{0.5cm}$}
+    \end{center}
+    \begin{center}
+        $\downarrow \beta$
+    \end{center}
+    \begin{center}
+        \uline{$\hspace{0.5cm}\ldots\hspace{0.5cm} u[x:=v]\hspace{0.5cm}\ldots\hspace{0.5cm}$}
+    \end{center}
+\end{remark}
+\begin{definition}
+    Замкнутый $\lambda$-терм - $\lambda$-терм без свободных переменных.
+\end{definition}
+\begin{definition}
+    \emph{Редекс} - выражение, к которому можно применить $\beta$-редукцию.
+\end{definition}
+    Процесс редукции не детерминированный. Мы можем выбрать любой редекс и применить к нему $\beta$-редукцию.
+\begin{definition}
+    $\lambda$-терм в нормальной формe - $\lambda$-терм, не имеющий редексов.
+\end{definition}
+    $\beta$-редукция не обязательно приводится к упрощению терма. К тому же, существуют $\lambda$-термы, не имеющие нормальной формы.
+\begin{example}
+    $\Omega = (\lambda x. (x x)) \underbrace{(\lambda x. (x
+    x))}_\text{$\omega$} \brarr (\omega \omega) = \Omega$
+\end{example}
+    Последовательности $\beta$-редукций можно представлять в виде графа.
+    \begin{definition}[SN]
+    Сильно нормализуемый $\lambda$-терм - $\lambda$-терм, т.ч. любая последоват
+    ельность $\beta$-редукций приводит к нормальной форме.
+\end{definition}
+\begin{definition}[WN]
+    Слабо нормализуемый $\lambda$-терм - $\lambda$-терм, для которого существует последовательность $\beta$-редукций, приводящая к нормальной форме.
+\end{definition}
+    Существует $\lambda$-термы с бесконечным графом редукции.
+\begin{example}
+\begin{gather*}
+       \xi = (\lambda x.(x x) x))\\
+        (\xi \xi) \brarr (\xi \xi) \xi \brarr ((\xi \xi) \xi) \xi \brarr
+        \ldots
+\end{gather*}
+\end{example}
+\begin{example}[WN, но не SN]
+    \begin{align*}
+        &(\lambda x. \lambda y.y) \Omega \brarr (\lambda y.y)\\
+        &\downarrow \beta \hspace{1.2cm}\nearrow \beta\\
+        &(\lambda x. \lambda y.y) \Omega\\
+        &\downarrow\\
+        &\hspace{0.2cm}\vdots
+    \end{align*}
+\end{example}
+    Тем не менее, для всех $\lambda$-термов верно свойство Чёрча-Россера.
+\begin{theorem}[CR]
+    Если $\lambda$-терм $E$, под действием некоторых последовательностей $\beta$-
+    редукций, средуцировался до $\lambda$-термов $E_1$ и $E_2$, то существует
+    $\lambda$-терм $N$, к которому они оба редуцируются.
+\end{theorem}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics{11.png}
+    \caption{свойство Чёрча-Россера}%
+    \label{fig:11}
+\end{figure}
+\begin{consequence}
+    Если нормальная форма есть, то она единственна. Действительно, eсли $E_1$ и $E_2$ - некоторые нормальные формы, то по св-ву Чёрча-Россера существует $\lambda$-терм
+    $N$, к которому они оба редуцируются. Но т.к. они уже являются нормальными
+    формами, эта последовательность редукций не может быть нетривиальной. Следо
+    вательно, $E_1 \aeq E_2$.
+\end{consequence}
+\begin{consequence}
+    Если нормальная форма есть, то с любой вершины графа можно добраться до нормальной формы.
+\end{consequence}
+\begin{definition}
+\begin{gather*}
+    \T = \lambda x.\lambda y.x\\
+    \F = \lambda x. \lambda y. y\\
+    [u, v] = \lambda z.((z u) v)\\
+\end{gather*}
+\end{definition}
+    С помощью чистого $\lambda$-исчисления можно закодировать натуральные числа.
+\begin{definition}[Нумералы]
+\begin{gather*}
+    d_0 = \lambda x.x\\
+    \ldots\\
+    d_{n+1} = [\F, d_n]
+\end{gather*}
+\end{definition}
+    В дальнейшем, на заданных таким образом нумералах можно задать все
+    привычные арифметические операции, и, в итоге, выразить все вычислимые
+    функции.
+\begin{theorem}
+    $f\colon \N^k \xdashrightarrow{} \N$ вычислима  $\iff$ $f$
+        $\lambda$-представима, т.е. существует $\lambda$-терм  $F$, т.ч. если
+        $f(n_1,\ldots, n_k) = m$, то $(F d_{n_1}) d_{n_2} \ldots d_{n_k} \brarr d_m$
+\end{theorem}
+\section{Вычислимые функции}
+\begin{definition}
+    Примитивно-рекурсивные функции - это:
+    \begin{itemize}
+        \item Базисные ПРФ:
+           \begin{enumerate}
+               \item $i_k^n(x_1, \ldots, x_n) = x \hspace{1.5cm}\leftrightarrow
+                   \hspace{2cm}(\lambda x_1\ldots x_n. x_k)$
+               \item  $z(x) = 0 \hspace{3.15cm}\leftrightarrow \hspace{2cm}(\lambda x. d_0)$
+               \item  $s(x) = x + 1 \hspace{2.45cm}\leftrightarrow
+                   \hspace{2cm}(\lambda x.[\F, x])$
+           \end{enumerate}
+        \item Композиция:
+            \begin{align*}
+                &g\colon \N^m \rightarrow \N - \text{ПРФ}\hspace{5.4cm}\\
+                &f_1,\ldots,f_m\colon \N^n \rightarrow \N - \text{ПРФ
+                }\hspace{5.4cm}\\
+                &h(\underbrace{x_1,\ldots,x_n}_{\vec{x}}) =
+                g(f_1(\vec{x}),\ldots, f_m(\vec{x}))\hspace{5.4cm}
+            \end{align*}
+        \item Примитивная рекурсия: $g, h \rightsquigarrow f$
+            \begin{align*}
+                \begin{cases}
+                    f(0, \vec{x}) = g(\vec{x})\hspace{5.9cm}\\
+                    f(n + 1, \vec{x}) = h(f(n, \vec{x}), n, \vec{x})\hspace{5.9cm}
+                \end{cases}
+            \end{align*}
+    \end{itemize}
+\end{definition}
+    Все примитивно-рекурсивные функции вычислимы и всюду определены. Но их
+    класс много уже, чем класс всех вычислимых функций.
+\begin{remark}
+    $[u, v]\:\F = v, [u, v]\:\T = u$.
+\end{remark}
+\begin{statement}
+    Композиция ПРФ, выраженная $\lambda$-термом:
+    \[
+        H = \lambda x_1, \ldots, x_m. \; G (F_1\; x_1 \ldots x_n) \ldots (F_m\; x_1
+        \ldots x_n)
+    .\]
+\end{statement}
+\begin{theorem}[о неподвижной точке]
+    $\forall$ $\lambda$-терма $F$ $\exists$  $\lambda$-терм  $U$, т.ч. $U \brarr
+    F\; U$
+\end{theorem}
+\begin{proof}
+    \[
+        U = (\lam{x}{F\; (x\; x)})\:(\lam{x}{F\; (x\; x)}) \brarr F\: U
+    .\]
+\end{proof}
+\begin{definition}
+    Комбинатор - это $\lambda$-терм без свободных переменных.
+\end{definition}
+\begin{definition}
+    Комбинатор неподвижной точки:
+    \[
+        \Y = \lam{f}{(\lam{x}{F\; (x\; x)})\:(\lam{x}{F\; (x\; x)})} = \lam{f}{U}
+    .\]
+\end{definition}
+    Результатом работы данного комбинатора является:
+    \[
+        U = \Y \; F \brarr F\;(\Y \; F)
+    .\]
+    Откуда следует \emph{равномерная теорема о неподвижной точке}.
+\begin{theorem}
+    $\exists$  $\Y$  $\forall$  $F$  $\colon$  $\Y \; F \beq F\;(\Y \; F)$.
+\end{theorem}
+    $\Y$ существует далеко не единственный, придумать их можно великое
+    множество.
+\begin{example}[Тьюринг]
+    \begin{gather*}
+        A = \lam{xy}{y\:(x\: x\:y)}\\
+        \theta = A\; A
+        \end{gather*}
+\end{example}
+\begin{definition}
+    $\beta$ - равенство - это  $\ldots$
+\end{definition}
+\begin{example}
+    $\Y \; F \brarr U \brarr F\: U \blarr F\;(\Y \; F)$
+\end{example}
+\begin{remark}
+    Если один из элементов равенства - нормальная форма, то $\beta$-равенство э
+    квивалентно $\beta$-редукции к данному $\lambda$-терму.
+\end{remark}
+\begin{theorem}[о рекурсии]
+    $\forall$  $M$  $\exists$  $F\colon$ $F \beq M[f:=F]$
+\end{theorem}
+\begin{proof}
+    $ F = \Y\:
+    (\lam{f}{M})$
+\end{proof}
+\end{document}

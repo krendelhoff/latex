@@ -1,0 +1,55 @@
+\documentclass[12pt, letterpaper]{extarticle}
+\usepackage{etoolbox}
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{mathtools}
+\usepackage[shortlabels]{enumitem}
+\makeatletter
+\newenvironment{sqcases}{%
+  \matrix@check\sqcases\env@sqcases
+}{%
+  \endarray\right.%
+}
+\def\env@sqcases{%
+  \let\@ifnextchar\new@ifnextchar
+  \left\lbrack
+  \def\arraystretch{1.2}%
+  \array{@{}l@{\quad}l@{}}%
+}
+\makeatother
+\newcommand \qed {\hfill $\blacksquare$}
+\newcommand{\N}{\ensuremath{\mathbb N}}
+\newcommand{\R}{\ensuremath{\mathbb R}}
+\newcommand{\Z}{\ensuremath{\mathbb Z}}
+\newcommand{\F}{\ensuremath{\mathbb F}}
+\newcommand{\W}{\ensuremath{\mathbb W}}
+\newcommand{\V}{\ensuremath{\mathbb V}}
+\newcommand{\Q}{\ensuremath{\mathbb Q}}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Image}{Im}
+\DeclareMathOperator{\Mat}{Mat}
+\DeclareMathOperator{\rk}{rk}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\id}{id}
+\DeclareMathOperator{\am}{a.m.}
+\DeclareMathOperator{\gm}{g.m.}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\title{Math}
+\author{Лаптов Дмитрий}
+
+\begin{document}
+\maketitle
+$\Ker - \Im = 228$
+\[
+\Im 228
+\] 
+\end{document}

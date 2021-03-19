@@ -1,0 +1,22 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[utf8]{inputenc}
+\graphicspath{{.}}
+
+\title{Math}
+\author{Savely Krendelhoff\thanks{dedicated to Mister M}}
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+    This is a simple paragraph at the beginning of the document. A brief
+    introduction about the main subject.
+\end{abstract}
+
+Now that we have written our abstract, we can begin writing our first paragraph.
+
+This line will start a second Paragraph.
+
+\end{document}
