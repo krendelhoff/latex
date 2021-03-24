@@ -1,4 +1,5 @@
 \documentclass[12pt, letterpaper]{extarticle}
+
 \usepackage{etoolbox}
 \usepackage{textcomp}
 \usepackage[normalem]{ulem}
@@ -8,6 +9,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{tikz}
+\usepackage{enumerate}
 \usepackage[T1,T2A]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
@@ -24,7 +26,9 @@
   \def\arraystretch{1.2}%
   \array{@{}l@{\quad}l@{}}%
 }
+
 \makeatletter
+
 \newcommand{\N}{\ensuremath{\mathbb N}}
 \newcommand{\R}{\ensuremath{\mathbb R}}
 \newcommand{\Z}{\ensuremath{\mathbb Z}}
@@ -84,8 +88,10 @@
     \mathpalette{\da@xarrow{#1}{#2}{}\da@rightarrow{\,}{}}{}%
   }%
 }
-\newcommand{\lam}[2]{\lambda #1.\; #2}
+\newcommand{\lam}[2]{\lambda #1.\, #2}
+
 \makeatother
+
 \DeclareMathOperator{\Ker}{Ker}
 \DeclareMathOperator{\ord}{ord}
 \DeclareMathOperator{\Image}{Im}
@@ -96,38 +102,76 @@
 \DeclareMathOperator{\id}{id}
 \DeclareMathOperator{\am}{a.m.}
 \DeclareMathOperator{\gm}{g.m.}
-\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
-            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 
 \title{$\lambda$-исчисление}
 \author{Лаптов Дмитрий}
 \date{18.03.2021}
+
 \newtheorem{definition}{Определение}[section]
 \newtheorem{example}{Пример}
 \newtheorem{badexample}{Антипример}
 \newtheorem{theorem}{Теорема}[section]
+\newtheorem{lemma}{Лемма}[section]
 \newtheorem{statement}{Утверждение}[section]
 \newtheorem{consequence}{Следствие}[theorem]
 \theoremstyle{remark}
 \newtheorem*{remark}{Примечание}
+\newtheorem*{notion}{Обозначение}
 \newtheorem*{clue}{Разгадка}
 
 \begin{document}
+
 \maketitle
+
 \section{Базовые определения}
 \begin{definition}
     $\lambda$-термы - это:
     \begin{enumerate}
         \item $x_1, x_2, \ldots$ - $\lambda$-термы. (переменные)
         \item $c_1, c_2, \ldots$ - $\lambda$-термы. (константы)
-        \item если $u, v$ - $\lambda$-термы, то $(u v)$ - $\lambda$-терм.
+        \item если $u, v$ - $\lambda$-термы, то $(u\: v)$ - $\lambda$-терм. (аппликация)
         \item если $u - \lambda$-терм, а  $x$ - переменная, то  $(\lambda x.u)$
-            - тоже $\lambda$-терм.
+            - тоже $\lambda$-терм. ($\lambda$-абстракция)
     \end{enumerate}
-
 \end{definition}
-    Множество $\lambda$-термов - это наименьшее множество, удовлетворяющее данному набору
+\begin{remark}
+    Абстракция связывает только свободные вхождения абстрагируемой переменной.
+\end{remark}
+Множество $\lambda$-термов(обозначается $\Lambda$) - это наименьшее множество, удовлетворяющее данному набору
     условий.
+\begin{definition}
+    Каррирование - способ задать функции многих переменных:
+    \[
+        F_x = \lam{y}{f(x,\,y)}
+    .\]
+    \[
+        F = \lam{x}{F_x}
+    .\]
+    Тогда
+    \[
+        (F\, x)\, y = F_x\,y=f(x,\,y)
+    .\]
+\end{definition}
+\begin{notion}
+    $    \lam{x}{\lam{y}{(x\,y)}} := \lam{xy}{(x\, y)} $
+\end{notion}
+\begin{definition}
+    Правила аппликации:
+    \[
+        F\,M_1\ldots M_n := (..((F\,M_1)M_2)\ldots M_n)
+    .\]
+\end{definition}
+\begin{definition}
+    Правила абстракции:
+    \[
+        \lam{x_1\ldots,x_n}{f(x_1,\ldots,x_n)} :=
+        \lam{x_1}{(\lam{x_2}{(\ldots(\lam{x_n}{f(x_1,\ldots,x_n)})..)})}
+    .\]
+\end{definition}
+\begin{notion}
+    $(\lam{\vec{x}}{f[\vec{x}]})\,\vec{N} = f[\vec{N}]$, где  $\vec{x} :=
+    (x_1,\ldots,x_n)$
+\end{notion}
 \begin{example}
      $\lambda x.x$ - тождественная функция.
 \end{example}
@@ -137,6 +181,69 @@
 \begin{remark}
     $(B f g) x \equiv f (g x)$
 \end{remark}
+\begin{definition}
+    \begin{enumerate}[(i)]
+        \item Множество \emph{свободных} переменных $\lambda$-терма  $M$ обозначается  $FV(M)$
+    определяется следующим образом:
+     \begin{gather*}
+         FV(x) = \{x\};\\
+         FV(M\,N) = FV(M) \cup FV(N);\\
+         FV(\lam{x}{M}) = FV(M) \setminus \{x\}.
+    \end{gather*}
+\item M называется \emph{замкнутым} $\lambda$-термом, если  $FV(M) =
+    \varnothing$ (мн-во замкнутых $\lambda$-термов обозначается  $\Lambda^o$).
+\item Результат подстановки обозначается как:
+    \begin{gather*}
+        x[x:=N] \equiv N;\\
+        y[x:=N] \equiv y, \text{если } x \ne y;\\
+        (M_1\,M_2)[x:=N] \equiv (M_1[x\,:=\,N])(M_2[x:=N]);\\
+        (\lam{y}{M_1})[x:=N] \equiv \lam{y}{(M_1[x:=N])}.
+    \end{gather*}
+    \end{enumerate}
+\end{definition}
+\begin{definition}
+    Переменная \emph{связана}, когда не является свободной.
+     $\lambda$-абстракция связывает переменную.
+\end{definition}
+\begin{example}
+    В $\lambda$-терме:
+     \[
+         \lam{xy}{xyz}
+    .\]
+    $x$ и  $y$ являются связанными переменными, а переменная  $z$ свободная.
+\end{example}
+\begin{definition}
+    Базовые аксиомы и правила:\\
+    Равенство:
+    \begin{gather*}
+        M = M;\\
+        M = N \implies N = M;\\
+        M = N, N = L \implies M = L;
+    \end{gather*}
+    Правила совместимости:
+    \begin{gather*}
+        M = M^{'} \implies M Z = M^{'} Z\\
+        M = M^{'} \implies Z M = Z M^{'}\\
+        M = M^{'} \implies \lam{x}{M} = \lam{x}{M^{i}}
+    \end{gather*}
+\end{definition}
+\begin{notion}
+    Если M = N доказуемо в $\lambda$-исчислении, то  это обозначается $\lambda
+    \vdash M = N$
+\end{notion}
+\begin{remark}
+    Из правил совместимости по индукции следует, что в большом $\lambda$-терме можно заменять равные подтермы:
+    \[
+        M = N \implies \uline{\ldots M \ldots} = \uline{\ldots N \ldots}
+    \]
+\end{remark}
+\begin{example}
+    $(\lam{y}{y y}) x$, так что
+     \[
+         \lambda \vdash \lam{x}{x((\lam{y}{y y}) x)} x = \lam{x}{x (x x) x}
+    .\]
+\end{example}
+
 \begin{definition}
     $\alpha$-конверсия:
     \begin{center}
@@ -157,7 +264,14 @@
         $(\lambda x.u) v \brarr u[x:=v]$ (если подстановка допустима)
     \end{center}
 \end{definition}
-    Для того, чтобы подставка была допустимой, должны быть выполнены некоторые
+\begin{remark}
+    Подстановка производится только в свободные вхождения переменной $x$ в
+    $\lambda$-терме  $u$.
+     \[
+         yx(\lam{x}{x})[x\,:=\, N] \equiv yN(\lam{x}{x})
+    .\]
+\end{remark}
+    Для того, чтобы подстановка была допустимой, должны быть выполнены некоторые
     условия.
 \begin{badexample}
     $(\lambda x. \underbrace{\lambda z.(x z)}_\text{u}) \underbrace{z}_\text{v}
@@ -173,15 +287,12 @@
     $(\lambda x. \lambda z. (x z)) z \ararr (\lambda x. \lambda y. (x y)) z
     \brarr (\lambda y. z y)$
 \end{example}
-    То есть, переменные, которые были свободны в $v$, не должны оказаться связа
-    нными $\lambda$-операторами, которые были в  $u$. В таком случае подставка
+    То есть, переменные, которые были свободны в $v$, не должны оказаться связанными $\lambda$-операторами, которые были в  $u$. В таком случае подстановка
     называется \emph{свободной} или \emph{допустимой}. Если она недопустима, то
     это решается применением $\alpha$-конверсии. Таким образом, если в $u$ нет
-    $\lambda$-операторов, или в $v$ нет свободных переменных, подставнока всегд
-    а будет допустимой.
+    $\lambda$-операторов, или в $v$ нет свободных переменных, подставнока всегда будет допустимой.
 
-    Другой подход заключается в том, что можно завести 2 алфавита свободных переменных и связанных, и связанные переменные всегда берутся из другого набор
-    а. Проблема заключается в том, что при применении $\lambda$-оператора по переменной $x$, придется переменовывать все её свободные вхождения в данном терме.
+    Другой подход заключается в том, что можно завести 2 алфавита свободных переменных и связанных, и связанные переменные всегда берутся из другого набора. Проблема заключается в том, что при применении $\lambda$-оператора по переменной $x$, придется переменовывать все её свободные вхождения в данном терме.
 \begin{remark}
     $\beta$-редукцию можно применять к подтермам бóльшего терма:
     \begin{center}
@@ -195,9 +306,26 @@
         \uline{$\hspace{0.5cm}\ldots\hspace{0.5cm} u[x:=v]\hspace{0.5cm}\ldots\hspace{0.5cm}$}
     \end{center}
 \end{remark}
-\begin{definition}
-    Замкнутый $\lambda$-терм - $\lambda$-терм без свободных переменных.
-\end{definition}
+\newpage
+\begin{lemma}
+    $\lambda$ $\vdash (\lam{x_1,\ldots,x_n}{M}) X_1\ldots X_n =
+    M[x_1:=X_1]\ldots[x_n:=X_n]$
+\end{lemma}
+\begin{proof}
+    Исходя из определения $\beta$-редукции, мы имеем:
+    \[
+            (\lam{x_1}{M}) X_1 = M[x_1:=X_1]
+    .\]
+По индукции, имеем:
+    \[
+        (\lam{x_1,\ldots,x_{n-1}}{M}) X_1,\ldots,X_{n-1} =
+        M[x_1:=X_1]\ldots[x_{n-1}:=X_{n-1}] = T
+    .\]
+Тогда, по аксиомам равенства:
+    \[
+        (\lam{x_n}{T}) X_n = T[x_n:=X_n] = M[x_1:=X_1]\ldots[x_n:=X_n]
+    .\]
+\end{proof}
 \begin{definition}
     \emph{Редекс} - выражение, к которому можно применить $\beta$-редукцию.
 \end{definition}
@@ -279,6 +407,7 @@
         $\lambda$-представима, т.е. существует $\lambda$-терм  $F$, т.ч. если
         $f(n_1,\ldots, n_k) = m$, то $(F d_{n_1}) d_{n_2} \ldots d_{n_k} \brarr d_m$
 \end{theorem}
+
 \section{Вычислимые функции}
 \begin{definition}
     Примитивно-рекурсивные функции - это:
@@ -371,4 +500,9 @@
     $ F = \Y\:
     (\lam{f}{M})$
 \end{proof}
+
+\begin{definition}
+    tistensetnsitnsietnisntisntisntin itensitnsitni enistnisntisnti
+    tntenetnentnt
+\end{definition}
 \end{document}
