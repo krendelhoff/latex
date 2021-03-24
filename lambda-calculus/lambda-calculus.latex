@@ -5,6 +5,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{amsmath}
 \usepackage{mathtools}
+\usepackage{verbatim}
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -38,6 +39,8 @@
 \newcommand{\Q}{\ensuremath{\mathbb Q}}
 \newcommand{\T}{\ensuremath{\mathbb T}}
 \newcommand{\Y}{\ensuremath{\mathbb Y}}
+\newcommand{\K}{\ensuremath{\mathbb K}}
+\newcommand{\A}{\ensuremath{\mathbb A}}
 \newcommand{\ararr}{\xrightarrow[\text{$\alpha$}]{\text{}}}
 \newcommand{\blarr}{\xleftarrow[\text{$\beta$}]{\text{}}}
 \newcommand{\brarr}{\xrightarrow[\text{$\beta$}]{\text{}}}
@@ -308,6 +311,7 @@
 \end{remark}
 \newpage
 \begin{lemma}
+\label{lem:subst}
     $\lambda$ $\vdash (\lam{x_1,\ldots,x_n}{M}) X_1\ldots X_n =
     M[x_1:=X_1]\ldots[x_n:=X_n]$
 \end{lemma}
@@ -326,8 +330,39 @@
         (\lam{x_n}{T}) X_n = T[x_n:=X_n] = M[x_1:=X_1]\ldots[x_n:=X_n]
     .\]
 \end{proof}
+\begin{remark}
+    В доказательстве мы сделали $\lambda$-абстракцию по $T$, а не по  $M$, и я
+    пока еще не понимаю, является ли такое рассуждение корректным. Впрочем,
+    относительно переменной  $x_n$  $\lambda$-термы $T$ и  $M$ неразличимы.
+\end{remark}
 \begin{definition}
-    \emph{Редекс} - выражение, к которому можно применить $\beta$-редукцию.
+    Комбинатором называется замкнутый $\lambda$-терм.
+\end{definition}
+\begin{example}
+    Стандартные комбинаторы:
+    \begin{align*}
+        \mathbb{I} &= \lam{x}{x};\\
+        \mathbb{K} &= \lam{xy}{x};\\
+        \mathbb{K_*} &= \lam{xy}{y};\\
+        \mathbb{S} &= \lam{xyz}{xz(yz)}
+    \end{align*}
+    Теперь, применяя Лемму \ref{lem:subst}, мы имеем следующие уравнения:
+    \begin{align*}
+        \mathbb{I} M &= M;\\
+        \mathbb{K} M N &= M;\\
+        \mathbb{K_*} M N &= N;\\
+        \mathbb{S} M N L &= M L (N L);
+    \end{align*}
+\end{example}
+Теперь мы можем решать простые уравнения.
+\begin{example}
+    $\exists$  $G$  $\forall$  $X$  $GX = X X X$
+    \[
+        G = \lam{x}{x x x}
+    .\]
+\end{example}
+\begin{definition}
+    Редекс - $\lambda$-терм. к которому можно применить $\beta$-редукцию.
 \end{definition}
     Процесс редукции не детерминированный. Мы можем выбрать любой редекс и применить к нему $\beta$-редукцию.
 \begin{definition}
@@ -384,6 +419,80 @@
 \begin{consequence}
     Если нормальная форма есть, то с любой вершины графа можно добраться до нормальной формы.
 \end{consequence}
+\begin{theorem}[о неподвижной точке]
+    \begin{enumerate}[(i)]
+        \item $\forall$  $F$  $\exists$  $X$  $F X = X$
+        \item Существует комбинатор неподвижной точки:
+             \[
+             \mathbb{Y} = \lam{f}{\lam{x}{f(x x)})(\lam{x}{f(x x)})}
+            .\]
+            Такой, что:
+            \[
+                \forall F\; F(\mathbb{Y} F) = \mathbb{Y} F
+            .\]
+    \end{enumerate}
+\end{theorem}
+\begin{proof}
+    \begin{enumerate}[(i)]
+        \item Определим $W = \lam{x}{F (x x)}$ и $X = W W$. Тогда \[
+                X = W W = (\lam{x}{F (x x)}) W = F (W W) = F X
+        .\]
+    \item Идентично с доказательством первого пункта.
+    \end{enumerate}
+\end{proof}
+\begin{example}
+    \begin{enumerate}[(i)]
+        \item $\exists G$ $\forall X$  $G X = \mathbb{S} G X$. Действительно,
+            \begin{align*}
+                \forall X \; G X = \mathbb{S} G X & \Leftarrow G x = \mathbb{S}
+                G x\\
+                                                  & \Leftarrow G =
+                                                  \lam{x}{\mathbb{S} G x}\\
+                                                  & \Leftarrow G =
+                                                  (\lam{gx}{\mathbb{S} g x})
+                                                  G\\
+                                                  & \Leftarrow G =
+                                                  \mathbb{Y}(\lam{gx}{\mathbb{S}g
+                                                  x})\\
+                                                  & \Leftarrow G =
+                                                  \mathbb{Y}\mathbb{S}
+            \end{align*}
+        \item  $\exists G$  $\forall X$  $G X = G G$, достаточно взять  $G =
+            \mathbb{y}(\lam{g x}{g g})$
+    \end{enumerate}
+\end{example}
+С помощью $\lambda$-исчисления, мы можем определить нумералы и представить
+числовые функции с их помощью.
+ \begin{definition}
+     \begin{enumerate}[(i)]
+         \item $F^n(M)$ с  $F \in \Lambda$ и  $n \in \N$ определяется
+             индуктивно:
+              \begin{gather*}
+                  F^0(M) = M;\\
+                  F^{n+1}(M) = F(F^n(M))
+             \end{gather*}
+        \item Нумералы Чёрча $c_0, c_1, c_2,\ldots$ определяются как:
+            \[
+                c_n = \lam{fx}{f^n(x)}
+            .\]
+    \end{enumerate}
+\end{definition}
+\begin{statement}[Д. Б. Россер]
+    Определим
+    \begin{gather*}
+        \A_{+} = \lam{xypq}{x p (y p q)}\\
+        \A_{*} = \lam{xyz}{x (y z)}\\
+        \A_{exp} = \lam{xy}{y x}
+    \end{gather*}
+Тогда, $\forall \: n, m \in \N$
+    \begin{enumerate}[(i)]
+        \item $\A_{+} c_n c_m = c_{n+m}$
+        \item $\A_{*} c_n c_m = c_{n*m}$
+        \item $A_{exp} c_n c_m = c_{(n^m)}$, кроме случая $m = 0$
+    \end{enumerate}
+\end{statement}
+
+\begin{comment}
 \begin{definition}
 \begin{gather*}
     \T = \lambda x.\lambda y.x\\
@@ -500,5 +609,5 @@
     $ F = \Y\:
     (\lam{f}{M})$
 \end{proof}
-
+\end{comment}
 \end{document}
